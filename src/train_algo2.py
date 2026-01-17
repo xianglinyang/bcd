@@ -17,14 +17,15 @@ from torch.utils.data import DataLoader
 from accelerate import Accelerator
 from accelerate.utils import set_seed, DistributedDataParallelKwargs
 
-from utils import (
+from train_utils import (
     load_model_and_tokenizer,
     build_layer_blocks, 
     freeze_except, 
     unfreeze_all, 
     momentum_step, 
     pick_block_idx, 
-    batch_iterator
+    batch_iterator,
+    save_model_and_tokenizer
 )
 from train_dataset import AlpacaSFTDataset, SFTDataCollator
 
@@ -50,6 +51,9 @@ def main():
     p.add_argument("--log_every", type=int, default=20)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--mixed_precision", choices=["no", "fp16", "bf16"], default="bf16")
+
+    # save control
+    p.add_argument("--save_dir", type=str, default="runs/algo2")
 
     args = p.parse_args()
 
@@ -127,6 +131,7 @@ def main():
                 print(f"step={outer_step} block={b} loss={loss_mean:.4f} "
                       f"backward={backward_calls} time={elapsed:.1f}s max_mem={max_mem:.2f}GB")
 
+    save_model_and_tokenizer(accelerator, model, tokenizer, args.save_dir)
     if accelerator.is_main_process:
         print("Done.")
 

@@ -17,8 +17,7 @@ import torch.nn as nn
 from accelerate import Accelerator
 import torch
 from typing import Iterable
-import math
-from torch.utils.data import DataLoader
+from pathlib import Path
 
 # -----------------------------
 # Blocks: one layer = one block
@@ -125,3 +124,17 @@ def batch_iterator(dataloader):
             yield next(it)
         except StopIteration:
             it = iter(dataloader)
+
+# ----------------------------
+# Save models and tokenizers
+# ----------------------------
+def save_model_and_tokenizer(accelerator: Accelerator, model: nn.Module, tokenizer: AutoTokenizer, save_dir: str):
+    accelerator.wait_for_everyone()
+    if accelerator.is_main_process:
+        Path(save_dir).mkdir(parents=True, exist_ok=True)
+        unwrapped = accelerator.unwrap_model(model)
+        # save_function=accelerator.save makes it safe under distributed runs
+        unwrapped.save_pretrained(save_dir, save_function=accelerator.save)
+        if tokenizer is not None:
+            tokenizer.save_pretrained(save_dir)
+    accelerator.wait_for_everyone()
