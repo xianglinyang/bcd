@@ -9,6 +9,7 @@ $ bash scripts/algo2.sh
 ```
 
 ## Plot Instruction
+跑完training之后，loss log会在`runs/`文件夹里，然后我们可以继续生成loss的图。
 ```console
 # 单个run的plot
 $ python src/plots/plot_one.py --csv runs/algo1/loss_time.csv --save_dir runs/algo1
@@ -21,3 +22,8 @@ $ python plot_compare_seaborn.py \
 ```
 
 # Eval Instruction
+需要把自己需要的hyperparameter在这个文件里定义。
+结果存在`eval_results/common_utility.json`里.
+```console
+bash scripts/evaluate_downstream.sh
+```
