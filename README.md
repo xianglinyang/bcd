@@ -1,5 +1,13 @@
 # Block Coordinate Decent
 
+## APIKEY
+```console
+$ nano ~/.bashrc
+# 加入一行
+export OPENROUTER_API_KEY="xxx"
+# source ~/.bashrc
+```
+
 ## Run Instruction
 1. 根据自己的machine，修改`src/fsdp_config/llama_fsdp_config.yaml`
   - 主要是num_process=gpu的数量

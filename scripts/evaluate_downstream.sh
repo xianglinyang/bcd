@@ -10,16 +10,16 @@ model_name_or_path_list=(
 # 把需要评估的dataset名称放在这里
 dataset_name_list=(
     "mmlu"
-    # "gsm8k"
-    # "arc-c"
-    # "arc-e"
-    # "boolq"
-    # "MMLU-STEM"
-    # "sciq"
-    # "SimpleQA"
-    # "adv_glue"
-    # "aqua"
-    # "strategyqa"
+    "gsm8k"
+    "arc-c"
+    "arc-e"
+    "boolq"
+    "MMLU-STEM"
+    "sciq"
+    "SimpleQA"
+    "adv_glue"
+    "aqua"
+    "strategyqa"
 )
 
 # 一个dataset的eval_num
@@ -32,7 +32,7 @@ eval_num_per_dataset=100
 # Example:
 # openai的model例子 gpt-4o-mini
 # openrouter的model例子 openai/gpt-4o-mini
-eval_llm_model_name="gpt-4o-mini"
+eval_llm_model_name="openai/gpt-4.1-nano"
 # --- End of Hyperparameters to modify ------
 
 
