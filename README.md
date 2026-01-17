@@ -1,5 +1,8 @@
 # Block Coordinate Decent
 
+## Huggingface Mirror
+see `https://hf-mirror.com/` for instruction.
+
 ## APIKEY
 ```console
 $ nano ~/.bashrc
