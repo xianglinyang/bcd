@@ -5,7 +5,7 @@
 $ nano ~/.bashrc
 # 加入一行
 export OPENROUTER_API_KEY="xxx"
-# source ~/.bashrc
+$ source ~/.bashrc
 ```
 
 ## Run Instruction
