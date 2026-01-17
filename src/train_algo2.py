@@ -14,6 +14,10 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
+import time
+import csv
+import os
+
 from accelerate import Accelerator
 from accelerate.utils import set_seed, DistributedDataParallelKwargs
 
@@ -102,6 +106,16 @@ def main():
 
     backward_calls = 0
     start = time.time()
+
+    # log consumption
+    csv_f, csv_w = None, None
+    if accelerator.is_main_process:
+        os.makedirs(args.save_dir, exist_ok=True)
+        csv_f = open(os.path.join(args.save_dir, "loss_time.csv"), "w", newline="")
+        csv_w = csv.writer(csv_f)
+        csv_w.writerow(["backward_calls", "loss", "wall_time_sec"])
+        csv_f.flush()
+
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
 
@@ -117,6 +131,15 @@ def main():
             loss = model(**batch).loss
             accelerator.backward(loss)
             backward_calls += 1
+
+            # -- log loss --
+            loss_mean = accelerator.gather(loss.detach()).mean().item()
+            wall_time = time.time() - start   
+            if accelerator.is_main_process:
+                csv_w.writerow([backward_calls, loss_mean, wall_time])
+                if backward_calls % 50 == 0:
+                    csv_f.flush()
+            # --- end of log loss ---
 
             momentum_step(blocks[b], args.lr, args.beta, local_state)
             model.zero_grad(set_to_none=True)
@@ -134,6 +157,10 @@ def main():
     save_model_and_tokenizer(accelerator, model, tokenizer, args.save_dir)
     if accelerator.is_main_process:
         print("Done.")
+    
+    if accelerator.is_main_process and csv_f is not None:
+        csv_f.flush()
+        csv_f.close()
 
 
 if __name__ == "__main__":
