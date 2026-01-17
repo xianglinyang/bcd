@@ -21,7 +21,7 @@ $ python plot_compare_seaborn.py \
   --save_dir runs --smooth 50
 ```
 
-# Eval Instruction
+## Eval Instruction
 需要把自己需要的hyperparameter在这个文件里定义。
 结果存在`eval_results/common_utility.json`里.
 ```console
