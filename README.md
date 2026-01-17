@@ -1,8 +1,13 @@
 # Block Coordinate Decent
 
 ## Run Instruction
-1. 在文件里设置hyperparameters
-2. 直接执行
+1. 根据自己的machine，修改`src/fsdp_config/llama_fsdp_config.yaml`
+  - 主要是num_process=gpu的数量
+  - 如果不是llamaLayer，需要修改
+2. 在sh文件里设置hyperparameters, `scripts/algo1.sh`。
+  - 主要fsdp config
+  - 修改 hyperparameters
+3. 执行
 ```console
 $ bash scripts/algo1.sh
 $ bash scripts/algo2.sh

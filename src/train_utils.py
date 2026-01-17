@@ -22,21 +22,28 @@ from pathlib import Path
 # -----------------------------
 # Blocks: one layer = one block
 # -----------------------------
+def _unwrap_module(m: nn.Module) -> nn.Module:
+    # works for DDP and FSDP top-level wrappers (both expose .module)
+    while hasattr(m, "module"):
+        m = m.module
+    return m
+
 def build_layer_blocks(model: nn.Module) -> List[List[nn.Parameter]]:
-    core = model.module if hasattr(model, "module") else model
+    core = _unwrap_module(model)
 
     if hasattr(core, "model") and hasattr(core.model, "layers"):
         layers = list(core.model.layers)
-        blocks = [[p for p in layer.parameters() if p.requires_grad] for layer in layers]
+        # each layer might be FSDP-wrapped; layer.parameters() will still return the right params (often a FlatParameter)
+        blocks = [list(layer.parameters()) for layer in layers]
         if not blocks:
-            raise ValueError("Found layers but no trainable params.")
+            raise ValueError("Found layers but no params.")
         return blocks
 
     if hasattr(core, "transformer") and hasattr(core.transformer, "h"):
         layers = list(core.transformer.h)
-        blocks = [[p for p in layer.parameters() if p.requires_grad] for layer in layers]
+        blocks = [list(layer.parameters()) for layer in layers]
         if not blocks:
-            raise ValueError("Found layers but no trainable params.")
+            raise ValueError("Found layers but no params.")
         return blocks
 
     raise ValueError("Unknown CausalLM layout: cannot find layers.")
@@ -132,9 +139,15 @@ def save_model_and_tokenizer(accelerator: Accelerator, model: nn.Module, tokeniz
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
         Path(save_dir).mkdir(parents=True, exist_ok=True)
-        unwrapped = accelerator.unwrap_model(model)
-        # save_function=accelerator.save makes it safe under distributed runs
-        unwrapped.save_pretrained(save_dir, save_function=accelerator.save)
-        if tokenizer is not None:
-            tokenizer.save_pretrained(save_dir)
+
+    unwrapped = accelerator.unwrap_model(model)
+    unwrapped.save_pretrained(
+        save_dir,
+        is_main_process=accelerator.is_main_process,
+        save_function=accelerator.save,
+        state_dict=accelerator.get_state_dict(model),  # FSDP关键
+    )
+    if accelerator.is_main_process and tokenizer is not None:
+        tokenizer.save_pretrained(save_dir)
+
     accelerator.wait_for_everyone()

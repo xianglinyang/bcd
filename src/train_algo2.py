@@ -65,8 +65,7 @@ def main():
     # Prepare model, data, and accelerator
     # ------------------------------------------------------------
 
-    ddp_kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
-    accelerator = Accelerator(mixed_precision=args.mixed_precision, kwargs_handlers=[ddp_kwargs])
+    accelerator = Accelerator(mixed_precision=args.mixed_precision)
     set_seed(args.seed)
 
     if accelerator.is_main_process:
