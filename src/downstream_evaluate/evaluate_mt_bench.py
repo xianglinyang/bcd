@@ -129,10 +129,10 @@ async def main():
     responses, latency_metrics = llm.batch_invoke(selected_questions, return_latency=True)
     
     mtbench_judge = load_judge_model(JudgeType.MT_BENCH, judge_model_name)
-    scores, _ = mtbench_judge.batch_get_score(selected_questions, responses)
+    scores, _ = await mtbench_judge.batch_get_score(selected_questions, responses)
 
     results = {
-        "avg_scores": np.mean(scores),
+        "avg_scores": float(np.mean(scores)),
         "dataset_name": "MTBench",
         "model_name_or_path": model_name_or_path,
         "eval_num": actual_eval_num,

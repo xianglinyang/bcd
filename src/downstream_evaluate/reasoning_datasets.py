@@ -357,6 +357,8 @@ def data_reader(dataset_name, split):
 
         response = requests.get(path)
         for line in response.text.split("\n"):
+            if line == "":
+                continue
             data = json.loads(line)
             question = data['turns'][0]
             category = data['category']
