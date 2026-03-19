@@ -41,6 +41,7 @@ Online Test:
 import re
 import random
 import json
+import requests
 from datasets import load_dataset
 from torch.utils.data import Dataset
 
@@ -351,7 +352,17 @@ def data_reader(dataset_name, split):
             answer = score_to_choices(int(label))
             questions.append(question)
             answers.append(answer)
+    elif dataset_name == "mtbench":
+        path = "https://huggingface.co/spaces/lmsys/mt-bench/resolve/main/data/mt_bench/question.jsonl"
 
+        response = requests.get(path)
+        for line in response.text.split("\n"):
+            data = json.loads(line)
+            question = data['turns'][0]
+            category = data['category']
+            questions.append(question)
+            answers.append("")
+            rationales.append("")
     else:
         raise ValueError("dataset is not properly defined ...")
     

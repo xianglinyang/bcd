@@ -78,3 +78,27 @@ def get_formatted_prompt(model_name_or_path, prompt):
         return QWEN_FORMATTED_PROMPT.format(prompt=prompt)
     else:
         raise ValueError(f"Not implemented for model: {model_name_or_path}")
+
+
+def get_system_prompt(model_name_or_path: str):
+    """
+    Return the default system prompt string for a given model.
+
+    `utils.py` expects this symbol to exist.
+    """
+    model_name_lower = model_name_or_path.lower()
+    if "llama-3" in model_name_lower or "llama3" in model_name_lower:
+        # Llama 3 templates reuse the same default content as Llama 2 in this repo.
+        return LLAMA2_DEFAULT_SYSTEM_PROMPT
+    if "llama-2" in model_name_lower or "llama2" in model_name_lower:
+        return LLAMA2_DEFAULT_SYSTEM_PROMPT
+    if (
+        "mistral-7" in model_name_lower
+        or "mistral" in model_name_lower
+        or "zephyr_7b_r2d2" in model_name_lower
+    ):
+        return MISTRAL_DEFAULT_SYSTEM_PROMPT
+    if "qwen" in model_name_lower:
+        return QWEN_DEFAULT_SYSTEM_PROMPT
+    # Unknown model: let caller omit system prompt.
+    return None
