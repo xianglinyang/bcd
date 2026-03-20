@@ -112,6 +112,10 @@ openrouter_models = [
 
     # X-AI
     "x-ai/grok-4",
+
+    # Minimax
+    "minimax/minimax-m2.7",
+    "minimax/minimax-m2.5",
 ]
 
 dashscope_models = [
@@ -268,6 +272,10 @@ implementation_to_name = {
 
     # OpenRouter X-AI models
     "x-ai/grok-4": "grok-4",
+
+    # OpenRouter Minimax models
+    "minimax/minimax-m2.7": "minimax-m2.7",
+    "minimax/minimax-m2.5": "minimax-m2.5",
 }
 
 def is_huggingface_model(model_name: str) -> bool:
